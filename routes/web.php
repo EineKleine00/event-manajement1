@@ -8,6 +8,7 @@ use App\Http\Controllers\Task\TaskController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -85,10 +86,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ====================================================
     Route::get('/ajax/users/search', function (Request $request) {
         $q = $request->q;
-        return \App\Models\User::where('name', 'like', "%$q%")
-            ->orWhere('email', 'like', "%$q%") // Tambah search by email juga biar enak
+        $eventId = $request->event_id;
+
+        // 1. Ambil ID member yg sudah join (Handle jika eventId kosong)
+        $existingUserIds = [];
+        if($eventId) {
+            $existingUserIds = DB::table('event_user')
+                                ->where('event_id', $eventId)
+                                ->pluck('user_id')
+                                ->toArray();
+        }
+
+        // 2. Query User
+        return \App\Models\User::query()
+            ->where('id', '!=', auth()->id()) // Exclude diri sendiri
+            ->whereNotIn('id', $existingUserIds) // Exclude yg sudah join
+            ->where(function($query) use ($q) {
+                $query->where('name', 'like', "%$q%")
+                    ->orWhere('email', 'like', "%$q%");
+            })
             ->limit(5)
             ->get(['id', 'name', 'email']);
+
     })->name('ajax.users.search');
 
     // ====================================================

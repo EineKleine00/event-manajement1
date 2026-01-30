@@ -75,21 +75,28 @@ class EventController extends Controller
     public function show(Event $event)
     {
         $userId = Auth::id();
-        
-        // Cek Security: Hanya Ketua atau Anggota Event yang boleh masuk
+
+        // 1. Cek Security
         $isKetua = $event->created_by == $userId;
         $isMember = $event->users()->where('user_id', $userId)->exists();
 
         if (!$isKetua && !$isMember) abort(403, 'Akses Ditolak');
 
-        // Load data tugas & anggota
-        $event->load(['users', 'tasks.user']);
+        // 2. Ambil Data Tugas (Logika Simpel)
+        if ($isKetua) {
+            // Ketua lihat semua
+            $tasks = $event->tasks()->with('user')->orderBy('created_at', 'desc')->get();
+        } else {
+            // Petugas lihat punya sendiri
+            $tasks = $event->tasks()
+                        ->where('user_id', $userId)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+        }
 
-        // Pisahkan task yang Pending dan Selesai untuk tampilan Kanban
-        $pendingTasks = $event->tasks->where('is_done', 0);
-        $completedTasks = $event->tasks->where('is_done', 1);
-
-        return view('events.show', compact('event', 'pendingTasks', 'completedTasks', 'isKetua'));
+        // 3. Return View (PERHATIKAN BAGIAN INI)
+        // Hapus 'pendingTasks' dan 'completedTasks' dari dalam compact
+        return view('events.show', compact('event', 'tasks', 'isKetua')); 
     }
 
     // === CRUD: Edit & Update (Hanya Ketua) ===

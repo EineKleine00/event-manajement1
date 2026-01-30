@@ -59,9 +59,8 @@
             <ul class="navbar-nav ms-auto align-items-center gap-2">
                 
                 <li class="nav-item">
-                    <button class="btn btn-link nav-link py-2 px-0 px-lg-2" id="bd-theme" type="button">
-                        <i class="bi bi-sun-fill" id="theme-icon-active" style="display: none;"></i>
-                        <i class="bi bi-moon-stars-fill" id="theme-icon-dark" style="display: none;"></i>
+                    <button class="btn btn-link nav-link" id="dark-mode-toggle" type="button">
+                        <i id="theme-icon" class="bi bi-sun-fill"></i>
                     </button>
                 </li>
 

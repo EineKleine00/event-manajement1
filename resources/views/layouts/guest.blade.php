@@ -10,24 +10,23 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+        {{-- JS BOOTSTRAP (Pindahkan ke Head + Defer) --}}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        {{-- SCRIPT TEMA (COPY-PASTE YG DARI NAVIGATION TADI AGAR SAMA) --}}
+        {{-- SCRIPT TEMA (SAMA PERSIS DENGAN APP.BLADE BIAR KONSISTEN) --}}
         <script>
-            const getStoredTheme = () => localStorage.getItem('theme')
-            const getPreferredTheme = () => {
-                const storedTheme = getStoredTheme()
-                if (storedTheme) return storedTheme
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-            }
-            const setTheme = theme => {
-                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark')
-                } else {
-                    document.documentElement.setAttribute('data-bs-theme', theme)
-                }
-            }
-            setTheme(getPreferredTheme())
+            (function() {
+                try {
+                    const storedTheme = localStorage.getItem('theme');
+                    const getPreferredTheme = () => {
+                        if (storedTheme) return storedTheme;
+                        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    };
+                    document.documentElement.setAttribute('data-bs-theme', getPreferredTheme());
+                } catch (e) {}
+            })();
         </script>
     </head>
     <body class="font-sans antialiased bg-body-tertiary text-body">
@@ -49,6 +48,5 @@
                 &copy; {{ date('Y') }} Event Management System
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

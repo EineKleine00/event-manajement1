@@ -1,36 +1,130 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Buat Event Baru</h2>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold text-body mb-1" style="letter-spacing: -0.5px;">Buat Event Baru</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 small">
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('events.index') }}" class="text-decoration-none">Events</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Create</li>
+                    </ol>
+                </nav>
+            </div>
+            <a href="{{ route('events.index') }}" class="btn btn-outline-secondary btn-sm rounded-3 fw-bold">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
-                
-                <form action="{{ route('events.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nama Event</label>
-                        <input type="text" name="name" class="form-control" required placeholder="Contoh: Pensi Sekolah 2026">
-                    </div>
+    <div class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
                     
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Tanggal Pelaksanaan</label>
-                        <input type="date" name="date" class="form-control" required>
+                    {{-- CARD FORMULIR --}}
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        {{-- Hiasan Garis Atas --}}
+                        <div class="card-header bg-primary p-1 border-0"></div>
+                        
+                        <div class="card-body p-5">
+                            
+                            <h4 class="fw-bold mb-4">Detail Acara</h4>
+
+                            <form action="{{ route('events.store') }}" method="POST">
+                                @csrf
+
+                                {{-- 1. NAMA EVENT --}}
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold small text-secondary text-uppercase ls-1">
+                                        Nama Event <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-body-tertiary border-0 text-secondary ps-3">
+                                            <i class="bi bi-fonts"></i>
+                                        </span>
+                                        <input type="text" name="name" 
+                                               class="form-control form-control-lg bg-body-tertiary border-0 @error('name') is-invalid @enderror" 
+                                               placeholder="Contoh: Pensi Sekolah 2026"
+                                               value="{{ old('name') }}" required>
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                {{-- 2. TANGGAL PELAKSANAAN --}}
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold small text-secondary text-uppercase ls-1">
+                                        Tanggal Pelaksanaan <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-body-tertiary border-0 text-secondary ps-3">
+                                            <i class="bi bi-calendar-event"></i>
+                                        </span>
+                                        <input type="date" name="date" 
+                                               class="form-control form-control-lg bg-body-tertiary border-0 @error('date') is-invalid @enderror" 
+                                               value="{{ old('date') }}" required>
+                                        @error('date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-text text-muted small ms-1">
+                                        Pilih tanggal utama kapan acara dimulai.
+                                    </div>
+                                </div>
+
+                                {{-- 3. DESKRIPSI --}}
+                                <div class="mb-5">
+                                    <label class="form-label fw-bold small text-secondary text-uppercase ls-1">
+                                        Deskripsi & Detail <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea name="description" rows="5" 
+                                              class="form-control bg-body-tertiary border-0 p-3 @error('description') is-invalid @enderror" 
+                                              placeholder="Jelaskan tujuan acara, target audiens, dan detail lainnya..." required>{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- TOMBOL AKSI --}}
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end pt-3 border-top">
+                                    <a href="{{ route('events.index') }}" class="btn btn-light btn-lg rounded-3 fw-bold px-4 text-secondary">
+                                        Batal
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold px-4 shadow-sm">
+                                        <i class="bi bi-check-lg me-1"></i> Simpan Event
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Deskripsi Event</label>
-                        <textarea name="description" class="form-control" rows="4" required placeholder="Jelaskan detail acara..."></textarea>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Simpan & Buat Event</button>
-                        <a href="{{ route('events.index') }}" class="btn btn-secondary">Batal</a>
-                    </div>
-                </form>
-
+                </div>
             </div>
         </div>
     </div>
+
+    {{-- CSS CUSTOM --}}
+    <style>
+        .ls-1 { letter-spacing: 0.5px; }
+        
+        /* Style Input Group biar nyatu & borderless */
+        .input-group-text {
+            background-color: var(--bs-body-bg-tertiary);
+        }
+        
+        /* Efek Fokus Input */
+        .form-control:focus {
+            box-shadow: none;
+            background-color: var(--bs-body-bg); 
+            border: 2px solid var(--bs-primary) !important;
+        }
+        /* Fix focus di input group */
+        .form-control:focus + .input-group-text, 
+        .input-group-text:has(+ .form-control:focus) {
+            border-color: var(--bs-primary);
+        }
+    </style>
 </x-app-layout>

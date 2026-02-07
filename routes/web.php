@@ -1,32 +1,19 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
-// --- IMPORT CONTROLLERS ---
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\PasswordController;
-
-// Controller Admin
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminEventController; 
-
-// Controller Event & User
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\EventMemberController; 
 use App\Http\Controllers\Event\EventReportController; 
 use App\Http\Controllers\Task\TaskController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 // Redirect root ke dashboard
 Route::get('/', function () {
@@ -35,11 +22,7 @@ Route::get('/', function () {
 
 // GROUP UTAMA: WAJIB LOGIN (Auth & Verified)
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    // ====================================================
     // A. SHARED ROUTES (Bisa Diakses Admin & User)
-    // ====================================================
-    
     // 1. Profile
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
@@ -58,13 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect('/');
     })->name('logout');
 
-
-    // ====================================================
     // B. AREA KHUSUS SUPER ADMIN
-    // ====================================================
     Route::middleware(['role:admin'])
-        ->prefix('admin')      // URL: /admin/...
-        ->name('admin.')       // NAMA ROUTE: admin.... (SOLUSI AGAR TIDAK ERROR)
+        ->prefix('admin')      
+        ->name('admin.')       
         ->group(function () {
         
         // 1. Dashboard Admin
@@ -73,7 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // 2. Manage Users
         // Hasil nama route: admin.users.index, admin.users.update, dll
-        Route::resource('users', AdminUserController::class)->only(['index', 'update', 'destroy']);
+        Route::resource('users', AdminUserController::class)->only(['index', 'edit', 'update', 'destroy']);
 
         // 3. Manage Events (FITUR BARU)
         // Hasil nama route: admin.events.index, admin.events.edit, dll
@@ -88,10 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     });
 
-
-    // ====================================================
     // C. AREA KHUSUS USER BIASA (Event Organizer)
-    // ====================================================
     // Kita tambahkan pengecualian admin agar route user tidak bentrok/double login
     Route::middleware(['role:user'])->group(function () {
 

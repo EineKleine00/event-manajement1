@@ -146,9 +146,9 @@
                             </form>
                         </div>
                         @endif
-                        <a href="{{ route('events.report', $event->id) }}" target="_blank" class="btn btn-outline-secondary fw-bold">
-                                        <i class="bi bi-printer-fill me-1"></i> Cetak Laporan
-                                    </a>
+                        <a href="{{ route('events.report.pdf', $event->id) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-printer-fill me-1"></i> Cetak Laporan
+                        </a>
                     </div>
                     @endif
 

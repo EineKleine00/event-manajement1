@@ -43,7 +43,7 @@
                                     </a>
 
                                     {{-- 2. Tombol Cetak Laporan (BARU) --}}
-                                    <a href="{{ route('events.report', $event->id) }}" target="_blank" class="btn btn-outline-secondary fw-bold">
+                                    <a href="{{ route('events.report.pdf', $event->id) }}" target="_blank" class="btn btn-outline-secondary fw-bold">
                                         <i class="bi bi-printer-fill me-1"></i> Cetak Laporan
                                     </a>
                                 </div>

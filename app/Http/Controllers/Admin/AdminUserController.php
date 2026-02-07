@@ -29,6 +29,11 @@ class AdminUserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([

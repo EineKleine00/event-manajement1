@@ -15,7 +15,7 @@ class TaskController extends Controller
     // === KETUA: Buat Task Baru & Assign ke Petugas ===
     public function store(Request $request, Event $event)
     {
-        // 1. Pastikan yang bikin task adalah Ketua Event
+        // 1. ketua buat event
         if ($event->created_by !== Auth::id()) abort(403);
 
         $validated = $request->validate([
@@ -24,8 +24,7 @@ class TaskController extends Controller
             'description' => 'required',
         ]);
         
-        // 2. Validasi Ekstra: Pastikan user yang ditunjuk ADALAH PETUGAS di event ini
-        // (Mencegah salah assign orang luar)
+        // 2. Validasi Ekstra Mencegah salah assign orang luar
         $isPetugas = DB::table('event_user')
             ->where('event_id', $event->id)
             ->where('user_id', $request->user_id)
@@ -39,7 +38,7 @@ class TaskController extends Controller
             'user_id' => $validated['user_id'],
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'is_done' => 0, // Default belum selesai
+            'is_done' => 0, 
         ]);
 
         return back()->with('success', 'Task berhasil diberikan.');

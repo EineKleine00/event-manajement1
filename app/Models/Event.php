@@ -4,31 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+    protected $fillable = [
+        'name', 
+        'description', 
+        'date',    
+        'location',   
+        'created_by'  
+    ];
 
-    // Sesuai tabel events di DB kamu
-    protected $fillable = ['name', 'description', 'date', 'created_by'];
-
-    // Relasi ke User (Anggota: Petugas/Sponsor) via tabel pivot 'event_user'
-    public function users()
+    /**
+     * Relasi ke Pembuat Event
+     */
+    public function user()
     {
-        return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
-                    ->withPivot('role') // Agar bisa baca dia 'petugas' atau 'sponsor'
-                    ->withTimestamps();
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 
-    // Relasi ke Task (1 Event punya Banyak Task)
-    public function tasks()
-    {
-        return $this->hasMany(Task::class);
-    }
-
-    // Relasi ke Pembuat Event (Ketua)
+    /**
+     * Relasi ke Pembuat Event (Nama Asli)
+     */
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Relasi ke Anggota (Petugas/Sponsor) via tabel pivot 'event_user'
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relasi ke Task
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
     }
 }

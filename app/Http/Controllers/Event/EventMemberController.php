@@ -38,6 +38,21 @@ class EventMemberController extends Controller
         return back()->with('success', 'Anggota berhasil ditambahkan.');
     }
 
+    public function update(Request $request, Event $event, User $user)
+    {
+        // Validasi input role
+        $request->validate([
+            'role' => 'required|in:petugas,sponsor'
+        ]);
+
+        // Update kolom 'role' di tabel pivot (event_user)
+        $event->users()->updateExistingPivot($user->id, [
+            'role' => $request->role
+        ]);
+
+        return back()->with('success', 'Peran anggota berhasil diperbarui.');
+    }
+
     /**
      * Hapus Member dari Event
      */

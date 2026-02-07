@@ -1,19 +1,26 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Event\EventController;
-use App\Http\Controllers\Event\EventMemberController; 
-use App\Http\Controllers\Event\EventReportController; 
-use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\AdminSettingController;
-use App\Http\Controllers\Task\TaskController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\PasswordController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
+// --- IMPORT CONTROLLERS ---
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\PasswordController;
+
+// Controller Admin
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\AdminEventController; 
+
+// Controller Event & User
+use App\Http\Controllers\Event\EventController;
+use App\Http\Controllers\Event\EventMemberController; 
+use App\Http\Controllers\Event\EventReportController; 
+use App\Http\Controllers\Task\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +28,7 @@ use Illuminate\Support\Facades\Auth;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root ke dashboard (nanti middleware akan mengarahkan sesuai role)
+// Redirect root ke dashboard
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -52,20 +59,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('logout');
 
 
-   // ====================================================
+    // ====================================================
     // B. AREA KHUSUS SUPER ADMIN
     // ====================================================
-    Route::middleware(['role:admin'])->prefix('admin')->group(function () {
+    Route::middleware(['role:admin'])
+        ->prefix('admin')      // URL: /admin/...
+        ->name('admin.')       // NAMA ROUTE: admin.... (SOLUSI AGAR TIDAK ERROR)
+        ->group(function () {
         
-        // Dashboard & Users (Yang sudah ada biarkan saja)
-        Route::get('/dashboard', [\App\Http\Controllers\AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        // 1. Dashboard Admin
+        // Hasil nama route: admin.dashboard
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        // 2. Manage Users
+        // Hasil nama route: admin.users.index, admin.users.update, dll
         Route::resource('users', AdminUserController::class)->only(['index', 'update', 'destroy']);
 
-        // --- TAMBAHKAN INI ---
-        // Route Settings
-        Route::controller(\App\Http\Controllers\AdminSettingController::class)->group(function() {
-            Route::get('/settings', 'index')->name('admin.settings.index');
-            Route::put('/settings', 'update')->name('admin.settings.update');
+        // 3. Manage Events (FITUR BARU)
+        // Hasil nama route: admin.events.index, admin.events.edit, dll
+        Route::resource('events', AdminEventController::class);
+
+        // 4. Settings
+        // Hasil nama route: admin.settings.index, admin.settings.update
+        Route::controller(AdminSettingController::class)->group(function() {
+            Route::get('/settings', 'index')->name('settings.index');
+            Route::put('/settings', 'update')->name('settings.update');
         });
 
     });
@@ -74,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ====================================================
     // C. AREA KHUSUS USER BIASA (Event Organizer)
     // ====================================================
+    // Kita tambahkan pengecualian admin agar route user tidak bentrok/double login
     Route::middleware(['role:user'])->group(function () {
 
         // 1. Dashboard Utama User
@@ -86,6 +105,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::controller(EventMemberController::class)->group(function () {
             Route::get('events/{event}/members', 'index')->name('events.members.index');
             Route::post('events/{event}/members', 'store')->name('events.members.store');
+            Route::put('events/{event}/members/{user}', 'update')->name('events.members.update');
             Route::delete('events/{event}/members/{user}', 'destroy')->name('events.members.destroy');
         });
 
@@ -109,7 +129,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/pdf', 'pdf')->name('.pdf');
         });
 
-        // 7. Live Search (Khusus User mencari Anggota)
+        // 7. Live Search (Ajax)
         Route::get('/ajax/users/search', function (Request $request) {
             $q = $request->q;
             $eventId = $request->event_id;
@@ -123,12 +143,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             }
 
             return \App\Models\User::query()
-                ->where('role', '!=', 'admin') // Opsional: Jangan tampilkan admin di pencarian member event
+                ->where('user_role', '!=', 'admin') // Opsional: Filter admin
                 ->where('id', '!=', auth()->id())
                 ->whereNotIn('id', $existingUserIds)
                 ->where(function($query) use ($q) {
                     $query->where('name', 'like', "%$q%")
-                        ->orWhere('email', 'like', "%$q%");
+                          ->orWhere('email', 'like', "%$q%");
                 })
                 ->limit(5)
                 ->get(['id', 'name', 'email']);

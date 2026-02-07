@@ -41,7 +41,7 @@
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
-                                        <li><a class="dropdown-item small" href="{{ route('users.index') }}">Lihat Detail</a></li>
+                                        <li><a class="dropdown-item small" href="{{ route('admin.users.index') }}">Lihat Detail</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                                 <h6 class="fw-bold mb-0 text-body">Pengguna Baru</h6>
                                 <small class="text-body-secondary">5 Pendaftar terakhir</small>
                             </div>
-                            <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Lihat Semua</a>
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Lihat Semua</a>
                         </div>
                         <div class="card-body p-0 mt-3">
                             <div class="table-responsive">
@@ -198,7 +198,7 @@
                             <p class="small opacity-75 mb-4">Akses cepat menu pengelolaan.</p>
                             
                             <div class="d-grid gap-2">
-                                <a href="{{ route('users.index') }}" class="btn btn-light text-primary fw-bold border-0 shadow-sm text-start p-3 d-flex align-items-center justify-content-between transition-hover">
+                                <a href="{{ route('admin.users.index') }}" class="btn btn-light text-primary fw-bold border-0 shadow-sm text-start p-3 d-flex align-items-center justify-content-between transition-hover">
                                     <span><i class="bi bi-person-plus-fill me-2"></i> Kelola Users</span>
                                     <i class="bi bi-arrow-right"></i>
                                 </a>

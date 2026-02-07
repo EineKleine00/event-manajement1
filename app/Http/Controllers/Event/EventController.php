@@ -80,10 +80,15 @@ class EventController extends Controller
         $isKetua = $event->created_by == $userId;
         $isMember = $event->users()->where('user_id', $userId)->exists();
 
+        $isSponsor = $event->users()
+                        ->where('user_id', $userId)
+                        ->where('event_user.role', 'sponsor')
+                        ->exists();
+
         if (!$isKetua && !$isMember) abort(403, 'Akses Ditolak');
 
         // 2. Ambil Data Tugas (Logika Simpel)
-        if ($isKetua) {
+        if ($isKetua || $isSponsor) {
             // Ketua lihat semua
             $tasks = $event->tasks()->with('user')->orderBy('created_at', 'desc')->get();
         } else {
@@ -96,7 +101,7 @@ class EventController extends Controller
 
         // 3. Return View (PERHATIKAN BAGIAN INI)
         // Hapus 'pendingTasks' dan 'completedTasks' dari dalam compact
-        return view('events.show', compact('event', 'tasks', 'isKetua')); 
+        return view('events.show', compact('event', 'tasks', 'isKetua', 'isSponsor')); 
     }
 
     // === CRUD: Edit & Update (Hanya Ketua) ===

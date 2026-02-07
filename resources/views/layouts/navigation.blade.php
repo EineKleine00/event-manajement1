@@ -27,23 +27,21 @@
                 @if(Auth::user()?->user_role === 'admin')
                     
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active fw-bold text-primary' : '' }}" 
-                           href="{{ route('admin.dashboard') }}">
-                           <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        <a class="nav-link {{ request()->routeIs('admin.events.*') ? 'active text-warning fw-bold' : '' }}" 
+                           href="{{ route('admin.events.index') }}">
+                           Manage Event
                         </a>
                     </li>
-                    
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('users.*') ? 'active fw-bold text-primary' : '' }}" 
-                           href="{{ route('users.index') }}">
-                           <i class="bi bi-people me-1"></i> Users
+                        <a class="nav-link {{ request()->routeIs('users.*') ? 'active text-warning fw-bold' : '' }}" 
+                           href="{{ route('admin.users.index') }}">
+                           Manage User
                         </a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active fw-bold text-primary' : '' }}" 
+                        <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active text-warning fw-bold' : '' }}" 
                            href="{{ route('admin.settings.index') }}">
-                           <i class="bi bi-sliders me-1"></i> Konfigurasi
+                           <i class="bi bi-gear-fill"></i> Konfigurasi
                         </a>
                     </li>
 

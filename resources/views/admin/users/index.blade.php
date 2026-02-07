@@ -12,7 +12,7 @@
             </div>
             
             {{-- SEARCH BAR --}}
-            <form action="{{ route('users.index') }}" method="GET" class="d-flex gap-2">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex gap-2">
                 <div class="input-group">
                     <span class="input-group-text bg-body-tertiary border-0 text-secondary"><i class="bi bi-search"></i></span>
                     <input type="text" name="search" class="form-control bg-body-tertiary border-0" 
@@ -164,7 +164,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     
-                    <form action="{{ route('users.update', $user->id) }}" method="POST">
+                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
                         @csrf @method('PUT')
                         <div class="modal-body p-4">
                             
@@ -226,7 +226,7 @@
                         
                         <div class="d-flex justify-content-center gap-2">
                             <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Batal</button>
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST">
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger fw-bold px-4">Ya, Hapus</button>
                             </form>

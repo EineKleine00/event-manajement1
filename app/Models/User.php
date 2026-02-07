@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Import Wajib
+use Illuminate\Database\Eloquent\SoftDeletes;       // Import Wajib
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,7 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'user_role',
+        'user_role', // Pastikan kolom ini ada
     ];
 
     /**
@@ -41,5 +43,15 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        // INI KUNCI SUKSES LOGIN:
+        'password' => 'hashed', 
     ];
+
+    /**
+     * Relasi: Satu User bisa membuat banyak Event
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class, 'created_by');
+    }
 }

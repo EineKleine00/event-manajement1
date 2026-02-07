@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Models\Setting; // Pastikan Model Setting sudah ada
+use App\Models\Setting; 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class AdminSettingController extends Controller
 {

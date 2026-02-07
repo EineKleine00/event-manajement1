@@ -64,8 +64,8 @@
                         </div>
                     </div>
 
-                    {{-- 2. MEMBER MANAGEMENT (Khusus Ketua) --}}
-                    @if($isKetua)
+                    {{-- 2. MEMBER TABEL (Khusus Ketua dan sponsor) --}}
+                    @if($isKetua||$isSponsor)
                     <div class="card mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
                         <div class="card-header bg-body border-bottom p-3">
                             <h6 class="fw-bold m-0"><i class="bi bi-people-fill me-2 text-primary"></i> Anggota Tim</h6>
@@ -79,7 +79,9 @@
                                         <tr>
                                             <th class="ps-4 small text-secondary text-uppercase">Nama</th>
                                             <th class="small text-secondary text-uppercase">Role</th>
+                                            @if ($isKetua)
                                             <th class="text-end pe-4 small text-secondary text-uppercase">Aksi</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody class="border-top-0">
@@ -94,12 +96,21 @@
                                                     {{ ucfirst($member->pivot->role) }}
                                                 </span>
                                             </td>
+                                            @if ($isKetua)
                                             <td class="text-end pe-4">
+                                                <button type="button" 
+                                                        class="btn btn-link text-warning p-0 btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#modalEditMember-{{ $member->id }}"
+                                                        title="Edit Role">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
                                                 <form action="{{ route('events.members.destroy', [$event->id, $member->id]) }}" method="POST" onsubmit="return confirm('Keluarkan member ini?');">
                                                     @csrf @method('DELETE')
                                                     <button class="btn btn-link text-danger p-0 btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>
                                             </td>
+                                            @endif
                                         </tr>
                                         @empty
                                         <tr>
@@ -112,6 +123,8 @@
                         </div>
                         
                         {{-- FORM TAMBAH MEMBER --}}
+                        @if ($isKetua)
+                        
                         <div class="card-footer bg-body-tertiary p-3 border-top">
                             <p class="small fw-bold text-secondary mb-2">Undang Anggota Baru</p>
                             <form action="{{ route('events.members.store', $event->id) }}" method="POST">
@@ -132,6 +145,10 @@
                                 </div>
                             </form>
                         </div>
+                        @endif
+                        <a href="{{ route('events.report', $event->id) }}" target="_blank" class="btn btn-outline-secondary fw-bold">
+                                        <i class="bi bi-printer-fill me-1"></i> Cetak Laporan
+                                    </a>
                     </div>
                     @endif
 
@@ -198,7 +215,7 @@
                                             <th class="ps-4 py-3 small text-secondary text-uppercase w-50">Task Info</th>
                                             <th class="py-3 small text-secondary text-uppercase">Petugas</th>
                                             <th class="py-3 small text-secondary text-uppercase">Status</th>
-                                            <th class="pe-4 py-3 text-end small text-secondary text-uppercase">Aksi</th>
+                                            @if ($isKetua) <th class="pe-4 py-3 text-end small text-secondary text-uppercase">Aksi</th> @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -242,7 +259,14 @@
                                             <td class="pe-4 text-end">
                                                 {{-- Tombol Edit (Ketua) --}}
                                                 @if($isKetua)
-                                                    <button class="btn btn-icon btn-sm btn-light text-secondary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditTask-{{ $task->id }}">
+                                                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus tugas ini?');" class="d-inline">
+                                                        @csrf 
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-link text-danger p-0 btn-sm">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                    <button class="btn btn-icon btn-sm btn-link text-secondary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditTask-{{ $task->id }}">
                                                         <i class="bi bi-pencil-fill"></i>
                                                     </button>
                                                 @endif
@@ -320,7 +344,7 @@
     {{-- 2. MODAL EDIT TASK --}}
     @if($isKetua)
         @foreach($tasks as $task)
-        <div class="modal fade" id="modalEditTask-{{ $task->id }}" aria-hidden="true">
+        <div class="modal fade" id="modalEditTask-{{ $task->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header bg-warning border-0">
@@ -360,6 +384,55 @@
         @endforeach
     @endif
 
+    {{-- 3. MODAL EDIT MEMBER --}}
+    @if($isKetua)
+        @foreach($event->users as $member)
+       <div class="modal fade" id="modalEditMember-{{ $member->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    
+                    <div class="modal-header bg-warning border-0">
+                        <h6 class="modal-title fw-bold text-dark">
+                            <i class="bi bi-person-gear me-2"></i>Edit Peran Anggota
+                        </h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form action="{{ route('events.members.update', [$event->id, $member->id]) }}" method="POST">
+                        @csrf
+                        @method('PUT') <div class="modal-body p-4 text-start">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-secondary">Nama Anggota</label>
+                                <input type="text" class="form-control bg-light" value="{{ $member->name }}" readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-secondary">Ganti Peran (Role)</label>
+                                <select name="role" class="form-select" required>
+                                    <option value="petugas" {{ $member->pivot->role == 'petugas' ? 'selected' : '' }}>Petugas</option>
+                                    <option value="sponsor" {{ $member->pivot->role == 'sponsor' ? 'selected' : '' }}>Sponsor</option>
+                                </select>
+                                <div class="form-text small">
+                                    <ul>
+                                        <li><strong>Petugas:</strong> Bisa mengerjakan tugas lapangan.</li>
+                                        <li><strong>Sponsor:</strong> Hanya memantau progres & laporan.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top-0 pt-0">
+                            <button type="button" class="btn btn-light text-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-warning fw-bold text-dark">Simpan Perubahan</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    @endif
+        
     {{-- SCRIPTS --}}
     <script>
         function konfirmasiKirim(form) {
@@ -378,8 +451,13 @@
             if (form) form.style.display = (form.style.display === 'none') ? 'block' : 'none';
         }
 
-        // LIVE SEARCH
+        // LIVE SEARCH & MODAL FIX
         document.addEventListener('DOMContentLoaded', function() {
+            // FIX: Pindahkan semua modal ke body agar tidak tertutup backdrop (masalah z-index)
+            document.querySelectorAll('.modal').forEach(modal => {
+                document.body.appendChild(modal);
+            });
+
             const searchInput = document.getElementById('member-search');
             const resultsDiv = document.getElementById('member-search-results');
             const userIdInput = document.getElementById('member-user-id');

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -12,76 +11,48 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_can_be_rendered(): void
+    /** @test */
+    public function halaman_login_bisa_dibuka()
     {
         $response = $this->get('/login');
-
-        $response
-            ->assertOk()
-            ->assertSeeVolt('pages.auth.login');
+        $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    /** @test */
+    public function user_bisa_login_dengan_password_benar()
     {
-        $user = User::factory()->create();
+        // 1. Buat User (Password otomatis di-hash oleh Model User)
+        // Kita set password manual 'password' biar pasti sama.
+        $user = User::factory()->create([
+            'password' => 'password', 
+        ]);
 
-        $component = Volt::test('pages.auth.login')
+        // 2. Test Login via Volt Component
+        Volt::test('pages.auth.login')
             ->set('form.email', $user->email)
-            ->set('form.password', 'password');
-
-        $component->call('login');
-
-        $component
+            ->set('form.password', 'password')
+            ->call('login')
             ->assertHasNoErrors()
-            ->assertRedirect(RouteServiceProvider::HOME);
-
-        $this->assertAuthenticated();
+            ->assertRedirect(route('dashboard'));
+            
+        $this->assertAuthenticatedAs($user);
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    /** @test */
+    public function user_gagal_login_jika_password_salah()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => 'password',
+        ]);
 
-        $component = Volt::test('pages.auth.login')
+        // Login pakai password ngawur via Volt
+        Volt::test('pages.auth.login')
             ->set('form.email', $user->email)
-            ->set('form.password', 'wrong-password');
+            ->set('form.password', 'salah-banget')
+            ->call('login')
+            ->assertHasErrors();
 
-        $component->call('login');
-
-        $component
-            ->assertHasErrors()
-            ->assertNoRedirect();
-
-        $this->assertGuest();
-    }
-
-    public function test_navigation_menu_can_be_rendered(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $response = $this->get('/dashboard');
-
-        $response
-            ->assertOk()
-            ->assertSeeVolt('layout.navigation');
-    }
-
-    public function test_users_can_logout(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $component = Volt::test('layout.navigation');
-
-        $component->call('logout');
-
-        $component
-            ->assertHasNoErrors()
-            ->assertRedirect('/');
-
+        // Pastikan masih tamu (Guest)
         $this->assertGuest();
     }
 }

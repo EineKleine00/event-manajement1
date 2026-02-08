@@ -41,6 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect('/');
     })->name('logout');
 
+    // 4. Report System
+    Route::controller(EventReportController::class)->prefix('events/{event}/report')->name('events.report')->group(function () {
+        Route::get('/', 'show');
+        Route::get('/pdf', 'pdf')->name('.pdf');
+    });
+
     // B. AREA KHUSUS SUPER ADMIN
     Route::middleware(['role:admin'])
         ->prefix('admin')      
@@ -100,13 +106,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/sponsor', 'sponsorEvents')->name('sponsor');
         });
 
-        // 6. Report System
-        Route::controller(EventReportController::class)->prefix('events/{event}/report')->name('events.report')->group(function () {
-            Route::get('/', 'show');
-            Route::get('/pdf', 'pdf')->name('.pdf');
-        });
-
-        // 7. Live Search (Ajax)
+        // 6. Live Search (Ajax)
         Route::get('/ajax/users/search', function (Request $request) {
             $q = $request->q;
             $eventId = $request->event_id;

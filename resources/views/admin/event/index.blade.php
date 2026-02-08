@@ -11,14 +11,14 @@
                 </p>
             </div>
             
-            {{-- Tombol Tambah (Opsional ditaruh di header) --}}
-            <a href="{{ route('events.create') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            {{-- Tombol Tambah --}}
+            <a href="{{ route('admin.events.create') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
                 <i class="bi bi-plus-lg me-2"></i>Buat Event
             </a>
         </div>
     </x-slot>
 
-    {{-- 2. BAGIAN KONTEN UTAMA ($slot) --}}
+    {{-- 2. BAGIAN KONTEN UTAMA --}}
     <div class="py-5">
         <div class="container">
             
@@ -56,7 +56,7 @@
                             </select>
                         </div>
 
-                        {{-- Tombol --}}
+                        {{-- Tombol Filter --}}
                         <div class="col-md-3 d-grid">
                             <button type="submit" class="btn btn-dark fw-bold">
                                 <i class="bi bi-funnel-fill me-1"></i> Terapkan Filter
@@ -97,9 +97,7 @@
                                             <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2 small" style="width: 30px; height: 30px;">
                                                 <i class="bi bi-person-x"></i>
                                             </div>
-                                            <div>
-                                                <div class="fst-italic text-decoration-line-through small">{{ $event->user->name }}</div>
-                                            </div>
+                                            <div class="fst-italic text-decoration-line-through small">{{ $event->user->name }}</div>
                                         </div>
                                     @elseif($event->user)
                                         <div class="d-flex align-items-center">
@@ -138,9 +136,18 @@
                                 {{-- Kolom Aksi --}}
                                 <td class="text-end pe-4">
                                     <div class="btn-group shadow-sm rounded-3" role="group">
+                                        
+                                        {{-- 1. DOWNLOAD PDF (Baru) --}}
+                                        <a href="{{ route('events.report.pdf', $event->id) }}" target="_blank" class="btn btn-sm btn-white border hover-info" title="Download Laporan PDF">
+                                            <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                        </a>
+
+                                        {{-- 2. Edit --}}
                                         <a href="{{ route('admin.events.edit', $event->id) }}" class="btn btn-sm btn-white border hover-warning" title="Edit">
                                             <i class="bi bi-pencil-square text-warning"></i>
                                         </a>
+
+                                        {{-- 3. Hapus --}}
                                         <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus event ini permanen (Soft Delete)?');">
                                             @csrf
                                             @method('DELETE')
@@ -179,5 +186,6 @@
         .btn-white { background: white; color: #333; }
         .hover-warning:hover { background: #fff3cd; border-color: #ffecb5; }
         .hover-danger:hover { background: #f8d7da; border-color: #f5c6cb; }
+        .hover-info:hover { background: #e0f2fe; border-color: #bae6fd; } /* CSS untuk hover tombol PDF */
     </style>
 </x-app-layout>

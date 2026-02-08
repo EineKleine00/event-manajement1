@@ -61,7 +61,7 @@
                                     <th class="py-3 small text-secondary text-uppercase fw-bold">Role Sistem</th>
                                     <th class="py-3 small text-secondary text-uppercase fw-bold">Terdaftar</th>
                                     <th class="pe-4 py-3 text-end small text-secondary text-uppercase fw-bold">Aksi</th>
-                                </div>
+                                </tr>
                             </thead>
                             <tbody>
                                 @forelse($users as $user)
@@ -156,7 +156,7 @@
     @foreach($users as $user)
         
         {{-- 1. MODAL EDIT --}}
-        <div class="modal fade" id="editUserModal-{{ $user->id }}" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal fade" id="editUserModal-{{ $user->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
                     <div class="modal-header bg-body border-0 pb-0">
@@ -211,32 +211,43 @@
 
         {{-- 2. MODAL DELETE (Kecuali Diri Sendiri) --}}
         @if(auth()->id() !== $user->id)
-        <div class="modal fade" id="deleteUserModal-{{ $user->id }}" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-body p-4 text-center">
-                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
-                            <i class="bi bi-person-x-fill fs-1"></i>
+            <div class="modal fade" id="deleteUserModal-{{ $user->id }}" tabindex="-1" aria-labelledby="deleteUserModalLabel-{{ $user->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger" id="deleteUserModalLabel-{{ $user->id }}">Konfirmasi Hapus</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <h5 class="fw-bold mb-2 text-body">Hapus Pengguna Ini?</h5>
-                        <p class="text-secondary small mb-4">
-                            Anda akan menghapus akun <strong>{{ $user->name }}</strong>.<br>
-                            Semua data event yang dibuat user ini mungkin akan terpengaruh.
-                        </p>
                         
-                        <div class="d-flex justify-content-center gap-2">
-                            <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Batal</button>
+                        <div class="modal-body text-start">
+                            Apakah Anda yakin ingin menghapus user <strong>{{ $user->name }}</strong>?
+                            <br>
+                            <small class="text-muted">Tindakan ini tidak dapat dibatalkan.</small>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            
                             <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger fw-bold px-4">Ya, Hapus</button>
+                                @csrf
+                                @method('DELETE') <button type="submit" class="btn btn-danger">Ya, Hapus!</button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         @endif
-
     @endforeach
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ambil semua elemen yang punya class 'modal'
+            var modals = document.querySelectorAll('.modal');
+            
+            // Pindahkan satu per satu ke bagian paling bawah tag <body>
+            modals.forEach(function (modal) {
+                document.body.appendChild(modal);
+            });
+        });
+    </script>
 
 </x-app-layout>

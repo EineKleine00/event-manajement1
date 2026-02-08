@@ -18,7 +18,7 @@
 
             {{-- ALERT SUKSES/ERROR --}}
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show mb-4  border-start border-success border-4 shadow-sm" role="alert">
+                <div class="alert alert-success alert-dismissible fade show mb-4 border-start border-success border-4 shadow-sm" role="alert">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-check-circle-fill me-2 fs-5"></i>
                         <div>{{ session('success') }}</div>
@@ -28,7 +28,7 @@
             @endif
 
             @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show mb-4  border-start border-danger border-4 shadow-sm" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show mb-4 border-start border-danger border-4 shadow-sm" role="alert">
                     <ul class="mb-0 small ps-3">
                         @foreach($errors->all() as $error) <li>{{ $error }}</li> @endforeach
                     </ul>
@@ -64,7 +64,7 @@
                         </div>
                     </div>
 
-                    {{-- 2. MEMBER TABEL (Khusus Ketua dan sponsor) --}}
+                    {{-- 2. MEMBER TABEL --}}
                     @if($isKetua||$isSponsor)
                     <div class="card mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
                         <div class="card-header bg-body border-bottom p-3">
@@ -72,7 +72,6 @@
                         </div>
                         
                         <div class="card-body p-0">
-                            {{-- TABEL MEMBER --}}
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-body-tertiary">
@@ -87,27 +86,54 @@
                                     <tbody class="border-top-0">
                                         @forelse ($event->users as $member)
                                         <tr>
+                                            {{-- VISUAL FIX MEMBER (Sama seperti Task) --}}
                                             <td class="ps-4">
-                                                <div class="fw-bold text-body small">{{ $member->name }}</div>
-                                                <div class="text-secondary" style="font-size: 0.75rem;">{{ $member->email }}</div>
+                                                <div class="d-flex align-items-center">
+                                                    {{-- Avatar --}}
+                                                    <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center me-2 
+                                                        {{ $member->trashed() ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' }}" 
+                                                        style="width: 32px; height: 32px; font-size: 0.8rem; fw-bold">
+                                                        @if($member->trashed())
+                                                            <i class="bi bi-person-slash"></i>
+                                                        @else
+                                                            {{ substr($member->name, 0, 1) }}
+                                                        @endif
+                                                    </div>
+                                                    {{-- Nama & Email --}}
+                                                    <div>
+                                                        <div class="fw-bold small {{ $member->trashed() ? 'text-danger fst-italic' : 'text-body' }}">
+                                                            {{ $member->name }}
+                                                            @if($member->trashed()) <span class="badge bg-danger text-white ms-1" style="font-size: 0.6rem;">Ex</span> @endif
+                                                        </div>
+                                                        <div class="{{ $member->trashed() ? 'text-danger-emphasis opacity-50' : 'text-secondary' }}" style="font-size: 0.7rem;">
+                                                            {{ $member->email }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
+                                            
                                             <td>
                                                 <span class="badge rounded-pill {{ $member->pivot->role == 'petugas' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis' }}">
                                                     {{ ucfirst($member->pivot->role) }}
                                                 </span>
                                             </td>
+                                            
                                             @if ($isKetua)
                                             <td class="text-end pe-4">
+                                                {{-- Tombol Edit: Disable jika user dihapus --}}
                                                 <button type="button" 
-                                                        class="btn btn-link text-warning p-0 btn-sm" 
+                                                        class="btn btn-link {{ $member->trashed() ? 'text-secondary opacity-25' : 'text-warning' }} p-0 btn-sm" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#modalEditMember-{{ $member->id }}"
-                                                        title="Edit Role">
+                                                        title="Edit Role"
+                                                        {{ $member->trashed() ? 'disabled' : '' }}>
                                                     <i class="bi bi-pencil-square"></i>
                                                 </button>
-                                                <form action="{{ route('events.members.destroy', [$event->id, $member->id]) }}" method="POST" onsubmit="return confirm('Keluarkan member ini?');">
+                                                
+                                                {{-- Tombol Hapus: Tetap aktif untuk membuang user hantu --}}
+                                                <form action="{{ route('events.members.destroy', [$event->id, $member->id]) }}" method="POST" onsubmit="return confirm('Keluarkan member ini?');" class="d-inline">
                                                     @csrf @method('DELETE')
-                                                    <button class="btn btn-link text-danger p-0 btn-sm"><i class="bi bi-trash"></i></button>
+                                                    <button class="btn btn-link text-danger p-0 btn-sm" title="Keluarkan Member"><i class="bi bi-trash"></i></button>
                                                 </form>
                                             </td>
                                             @endif
@@ -124,7 +150,6 @@
                         
                         {{-- FORM TAMBAH MEMBER --}}
                         @if ($isKetua)
-                        
                         <div class="card-footer bg-body-tertiary p-3 border-top">
                             <p class="small fw-bold text-secondary mb-2">Undang Anggota Baru</p>
                             <form action="{{ route('events.members.store', $event->id) }}" method="POST">
@@ -151,7 +176,6 @@
                         </a>
                     </div>
                     @endif
-
                 </div>
 
                 {{-- KOLOM KANAN: TASK MANAGEMENT --}}
@@ -162,12 +186,19 @@
                                 <h5 class="fw-bold mb-1">Daftar Tugas</h5>
                                 <p class="text-secondary small mb-0">Monitor progres pekerjaan tim.</p>
                             </div>
-                            
                             @if($isKetua)
                             <button class="btn btn-primary btn-sm fw-bold rounded-3 shadow-sm" onclick="toggleAddTaskForm()">
                                 <i class="bi bi-plus-lg me-1"></i> Buat Task
                             </button>
                             @endif
+                        </div>
+
+                        {{-- NOTE KECIL VISUAL INDICATOR --}}
+                        <div class="bg-warning-subtle px-4 py-2 small d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill text-warning-emphasis me-2"></i>
+                            <span class="text-secondary">
+                                Info: Icon <i class="bi bi-person-slash text-danger mx-1"></i> menandakan user telah non-aktif/dihapus dari sistem.
+                            </span>
                         </div>
 
                         <div class="card-body p-0">
@@ -188,7 +219,8 @@
                                             <select name="user_id" class="form-select" required>
                                                 <option value="">Pilih...</option>
                                                 @foreach($event->users as $u)
-                                                    @if($u->pivot->role == 'petugas')
+                                                    {{-- Hanya tampilkan user aktif di dropdown buat task --}}
+                                                    @if($u->pivot->role == 'petugas' && !$u->trashed())
                                                         <option value="{{ $u->id }}">{{ $u->name }}</option>
                                                     @endif
                                                 @endforeach
@@ -232,13 +264,26 @@
                                                 @endif
                                             </td>
 
-                                            {{-- PETUGAS --}}
+                                            {{-- PETUGAS (DENGAN VISUAL FIX) --}}
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem; fw-bold">
-                                                        {{ substr($task->user->name, 0, 1) }}
+                                                    {{-- AVATAR --}}
+                                                    <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center me-2 
+                                                        {{ $task->user ? 'bg-secondary bg-opacity-10 text-secondary' : 'bg-danger-subtle text-danger' }}" 
+                                                        style="width: 32px; height: 32px; font-size: 0.8rem; fw-bold"
+                                                        title="{{ $task->user ? 'User Aktif' : 'User Tidak Aktif' }}">
+                                                        
+                                                        @if($task->user)
+                                                            {{ substr($task->user->name, 0, 1) }}
+                                                        @else
+                                                            <i class="bi bi-person-slash"></i>
+                                                        @endif
                                                     </div>
-                                                    <span class="small fw-semibold text-body">{{ $task->user->name }}</span>
+                                                    
+                                                    {{-- NAMA --}}
+                                                    <span class="small fw-semibold {{ $task->user ? 'text-body' : 'text-danger fst-italic' }}">
+                                                        {{ $task->user ? $task->user->name : 'Ex-Anggota' }}
+                                                    </span>
                                                 </div>
                                             </td>
 
@@ -257,7 +302,6 @@
 
                                             {{-- AKSI --}}
                                             <td class="pe-4 text-end">
-                                                {{-- Tombol Edit (Ketua) --}}
                                                 @if($isKetua)
                                                     <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus tugas ini?');" class="d-inline">
                                                         @csrf 
@@ -276,7 +320,7 @@
                                                     <a href="{{ asset('storage/' . $task->image_proof) }}" target="_blank" class="btn btn-icon btn-sm btn-primary shadow-sm ms-1" title="Lihat Bukti">
                                                         <i class="bi bi-image"></i>
                                                     </a>
-                                                @elseif(!$task->is_done && Auth::id() == $task->user_id)
+                                                @elseif(!$task->is_done && $task->user && Auth::id() == $task->user->id) 
                                                     <button class="btn btn-sm btn-primary shadow-sm ms-1" data-bs-toggle="modal" data-bs-target="#modalFinishTask-{{ $task->id }}">
                                                         Lapor <i class="bi bi-camera-fill ms-1"></i>
                                                     </button>
@@ -301,11 +345,11 @@
         </div>
     </div>
 
-    {{-- ====================== MODALS (DARK MODE READY) ====================== --}}
+    {{-- ====================== MODALS ====================== --}}
 
     {{-- 1. MODAL LAPOR SELESAI --}}
     @foreach($tasks as $task)
-        @if(!$task->is_done && Auth::id() == $task->user_id)
+        @if(!$task->is_done && $task->user && Auth::id() == $task->user->id)
         <div class="modal fade" id="modalFinishTask-{{ $task->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered"> 
                 <div class="modal-content border-0 shadow-lg"> 
@@ -361,9 +405,18 @@
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-secondary">Petugas</label>
                                 <select name="user_id" class="form-select" required>
+                                    @if($task->user)
+                                        <option value="{{ $task->user->id }}" selected class="bg-light fw-bold">{{ $task->user->name }} (Terpilih)</option>
+                                    @else
+                                        <option value="" selected disabled class="text-danger">Ex-Anggota (Harap Pilih Baru)</option>
+                                    @endif
+                                    
+                                    <option disabled>----------------</option>
+                                    
                                     @foreach($event->users as $u)
-                                        @if($u->pivot->role == 'petugas')
-                                            <option value="{{ $u->id }}" {{ $task->user_id == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
+                                        {{-- Jangan tampilkan user dihapus di pilihan baru --}}
+                                        @if($u->pivot->role == 'petugas' && !$u->trashed() && ($task->user_id != $u->id))
+                                            <option value="{{ $u->id }}">{{ $u->name }}</option>
                                         @endif
                                     @endforeach
                                 </select>
@@ -387,7 +440,9 @@
     {{-- 3. MODAL EDIT MEMBER --}}
     @if($isKetua)
         @foreach($event->users as $member)
-       <div class="modal fade" id="modalEditMember-{{ $member->id }}" tabindex="-1" aria-hidden="true">
+        {{-- Hanya render modal jika user tidak di-trash. User trash tidak bisa diedit. --}}
+        @if(!$member->trashed())
+        <div class="modal fade" id="modalEditMember-{{ $member->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
                     
@@ -412,12 +467,6 @@
                                     <option value="petugas" {{ $member->pivot->role == 'petugas' ? 'selected' : '' }}>Petugas</option>
                                     <option value="sponsor" {{ $member->pivot->role == 'sponsor' ? 'selected' : '' }}>Sponsor</option>
                                 </select>
-                                <div class="form-text small">
-                                    <ul>
-                                        <li><strong>Petugas:</strong> Bisa mengerjakan tugas lapangan.</li>
-                                        <li><strong>Sponsor:</strong> Hanya memantau progres & laporan.</li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
 
@@ -430,6 +479,7 @@
                 </div>
             </div>
         </div>
+        @endif
         @endforeach
     @endif
         
@@ -453,7 +503,7 @@
 
         // LIVE SEARCH & MODAL FIX
         document.addEventListener('DOMContentLoaded', function() {
-            // FIX: Pindahkan semua modal ke body agar tidak tertutup backdrop (masalah z-index)
+            // FIX: Pindahkan semua modal ke body agar tidak tertutup backdrop
             document.querySelectorAll('.modal').forEach(modal => {
                 document.body.appendChild(modal);
             });

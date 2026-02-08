@@ -23,7 +23,6 @@ class AdminEventController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('location', 'LIKE', "%{$search}%")
                   // Cari juga berdasarkan nama User pembuatnya
                   ->orWhereHas('user', function($u) use ($search) {
                       $u->where('name', 'LIKE', "%{$search}%");
@@ -56,7 +55,7 @@ class AdminEventController extends Controller
         $event = Event::findOrFail($id);
         
         // Kita "Nebeng" view edit punya user biasa biar hemat file
-        return view('events.edit', compact('event')); 
+        return view('admin.event.edit', compact('event')); 
     }
 
     /**
@@ -69,7 +68,6 @@ class AdminEventController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'event_date' => 'required|date',
-            'location' => 'required|string',
             'description' => 'nullable|string',
         ]);
 

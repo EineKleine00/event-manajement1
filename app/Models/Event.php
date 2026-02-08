@@ -12,8 +12,7 @@ class Event extends Model
     protected $fillable = [
         'name', 
         'description', 
-        'date',    
-        'location',   
+        'date',   
         'created_by'  
     ];
 
@@ -41,6 +40,8 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'event_user', 'event_id', 'user_id')
                     ->withPivot('role')
                     ->withTimestamps();
+        
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 
     /**

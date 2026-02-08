@@ -44,6 +44,16 @@ class EventReportController extends Controller
 
     public function pdf(Event $event)
     {
+        // 1. Apakah dia SUPER ADMIN? -> BOLEH
+        $isAdmin = (Auth::user()->user_role === 'admin');
+
+        // 2. Apakah dia KETUA (Pemilik Event)? -> BOLEH
+        $isKetua = ($event->created_by === Auth::id());
+
+        // 3. JIKA BUKAN KEDUANYA -> TENDANG KELUAR (403 Forbidden)
+        if (! $isAdmin && ! $isKetua) {
+            abort(403, 'Akses Ditolak. Laporan hanya untuk Ketua Panitia & Admin.');
+        }
         $data = $this->getData($event);
 
         // 2. GENERATE PDF MENGGUNAKAN DOMPDF

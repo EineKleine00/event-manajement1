@@ -42,20 +42,20 @@ To ensure scalability and ease of maintenance, the system follows the strict **M
 ```mermaid
 flowchart LR
     subgraph Client_Side ["Client Side (Frontend)"]
-        Browser[User Browser]
+        Browser["User Browser"]
     end
 
     subgraph Server_Side ["Server Side (Laravel Backend)"]
         direction TB
-        Router[Routing (Web.php)]
-        Middleware[Middleware (Security/Auth)]
-        Controller[Controllers (Business Logic)]
-        Model[Eloquent Models]
-        View[Blade Templates / PDF Engine]
+        Router["Routing (Web.php)"]
+        Middleware["Middleware (Security/Auth)"]
+        Controller["Controllers (Business Logic)"]
+        Model["Eloquent Models"]
+        View["Blade Templates / PDF Engine"]
     end
 
     subgraph Database ["Data Storage"]
-        MySQL[(MySQL Database)]
+        MySQL[("MySQL Database")]
     end
 
     %% Data Flow

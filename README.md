@@ -13,7 +13,7 @@
 
 **To Hiring Managers & Recruiters:**
 
-Hello, I am **[NAMA KAMU]**, a final-year Informatics student specializing in **Backend Development**.
+Hello, I am **EineKleine**, a final-year Informatics student specializing in **Backend Development**.
 This project demonstrates my ability to build a scalable **MVC application** with complex features such as **Role-Based Access Control (RBAC)**, **Task Management**, and **Automated Reporting**.
 
 I focused on writing clean, maintainable code and delivering a user-friendly interface. I am eager to apply these skills in a professional environment.

@@ -1,69 +1,72 @@
 # 🚀 Integrated Event Management System
 
-![Laravel](https://img.shields.io/badge/Laravel-11.x-red?style=for-the-badge&logo=laravel)
+![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)
 ![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php)
-![MySQL](https://img.shields.io/badge/MySQL-00000f?style=for-the-badge&logo=mysql)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap)
+![MySQL](https://img.shields.io/badge/Database-MySQL-00000f?style=for-the-badge&logo=mysql)
+![Bootstrap](https://img.shields.io/badge/Frontend-Bootstrap_5-7952B3?style=for-the-badge&logo=bootstrap)
 
-> A comprehensive web-based platform designed to streamline event organization, facilitate team collaboration, and automate accountability reporting.
-
----
-
-## 📖 About The Project
-
-The **Integrated Event Management System** is a robust web application built with **Laravel 11**. It solves the problem of manual event tracking by providing a centralized dashboard for Event Organizers (Ketua), Committee Members, and Sponsors.
-
-Key capabilities include **Role-Based Access Control (RBAC)** to secure data, a **Kanban-style Task Management** system for real-time progress tracking, and an **Automated PDF Generator** for creating instant accountability reports (Laporan Pertanggungjawaban).
-
-### ✨ Key Features
-
-* **🔐 Multi-Role Authentication (RBAC):**
-    * **Super Admin:** Manage all users and global system settings.
-    * **Organizer (Ketua):** Full control over specific events and member assignments.
-    * **Member:** View tasks and update status (Pending/Done).
-    * **Sponsor:** Read-only access to monitor event progress transparency.
-* **📅 Event & Task Management:**
-    * Create, Edit, and Delete events with detailed metadata.
-    * Assign tasks to specific members with deadlines.
-    * Real-time progress bar calculation based on completed tasks.
-* **📄 Automated Reporting (DomPDF):**
-    * One-click generation of official PDF reports.
-    * Includes automatic formatting for A4 paper size.
-* **🛡️ Security:**
-    * Middleware grouping for route protection.
-    * CSRF protection and input validation.
+> **Professional Portfolio Project** > A comprehensive web-based platform designed to streamline event organization, facilitate team collaboration, and automate accountability reporting.
 
 ---
 
-## 🛠️ Tech Stack
+## 👨‍💻 Author's Note
 
-| Component | Technology |
-| :--- | :--- |
-| **Framework** | Laravel 11 (PHP 8.2+) |
-| **Database** | MySQL / MariaDB |
-| **Frontend** | Blade Templates, Bootstrap 5, JavaScript |
-| **PDF Engine** | barryvdh/laravel-dompdf |
-| **Icons** | Bootstrap Icons |
+**To Hiring Managers & Recruiters:**
 
----
+Hello, I am **[NAMA KAMU]**, a final-year Informatics student specializing in **Backend Development**.
+This project demonstrates my ability to build a scalable **MVC application** with complex features such as **Role-Based Access Control (RBAC)**, **Task Management**, and **Automated Reporting**.
 
-## 📸 Screenshots
-
-| **Admin Dashboard** | **Task Management** |
-|:---:|:---:|
-| ![Dashboard](https://via.placeholder.com/600x300?text=Dashboard+Screenshot) | ![Tasks](https://via.placeholder.com/600x300?text=Task+Manager+Screenshot) |
-
-| **PDF Report Output** | **Responsive Mobile View** |
-|:---:|:---:|
-| ![PDF](https://via.placeholder.com/600x300?text=PDF+Report+Screenshot) | ![Mobile](https://via.placeholder.com/600x300?text=Mobile+View) |
+I focused on writing clean, maintainable code and delivering a user-friendly interface. I am eager to apply these skills in a professional environment.
 
 ---
 
-## ⚙️ Installation & Setup
+## 🎯 Project Overview
 
-Follow these steps to run the project locally:
+### The Problem
+Managing organizational events manually using spreadsheets often leads to data redundancy, miscommunication between committee members, and delays in creating accountability reports.
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/your-username/event-management-system.git](https://github.com/your-username/event-management-system.git)
-cd event-management-system
+### The Solution
+I developed this **Event Management System** to centralize all operations. It allows the Chairperson, Members, and Sponsors to collaborate on a single platform.
+
+**Key Capabilities:**
+1.  **Secure Access:** Multi-level authentication (Admin, Organizer, Member, Sponsor).
+2.  **Efficiency:** Automated task tracking (Kanban logic) and PDF report generation.
+3.  **Transparency:** Real-time progress monitoring for stakeholders.
+
+---
+
+## 🏗️ System Architecture
+
+To ensure scalability and ease of maintenance, the system follows the strict **Model-View-Controller (MVC)** architectural pattern.
+
+```mermaid
+flowchart LR
+    subgraph Client_Side ["Client Side (Frontend)"]
+        Browser[User Browser]
+    end
+
+    subgraph Server_Side ["Server Side (Laravel Backend)"]
+        direction TB
+        Router[Routing (Web.php)]
+        Middleware[Middleware (Security/Auth)]
+        Controller[Controllers (Business Logic)]
+        Model[Eloquent Models]
+        View[Blade Templates / PDF Engine]
+    end
+
+    subgraph Database ["Data Storage"]
+        MySQL[(MySQL Database)]
+    end
+
+    %% Data Flow
+    Browser -->|HTTP Request| Router
+    Router -->|Check Role| Middleware
+    Middleware -->|Verified| Controller
+    Controller <-->|Query/Save| Model
+    Model <-->|Read/Write| MySQL
+    Controller -->|Render Data| View
+    View -->|HTML / PDF Response| Browser
+
+    style Client_Side fill:#f9f9f9,stroke:#333,stroke-width:1px
+    style Server_Side fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    style Database fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
